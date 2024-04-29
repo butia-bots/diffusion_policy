@@ -99,11 +99,19 @@ class DorisEnv(gym.Env):
             act = None
             if self.teleop:
                 act = np.array([*self.get_arm_pose(), self.get_gripper_opening()])
-                act[0] += pygame.joystick.Joystick(0).get_axis(0)*0.05
-                act[1] += pygame.joystick.Joystick(0).get_axis(1)*0.05
-                act[2] += pygame.joystick.Joystick(0).get_axis(2)*0.05
-                act[3] += pygame.joystick.Joystick(0).get_axis(3)*0.05
-                act[4] += pygame.joystick.Joystick(0).get_axis(4)*0.05
+                act[0] += pygame.joystick.Joystick(0).get_axis(pygame.CONTROLLER_AXIS_LEFTX)*0.05
+                act[1] += pygame.joystick.Joystick(0).get_axis(pygame.CONTROLLER_AXIS_LEFTY)*0.05
+                act[2] += pygame.joystick.Joystick(0).get_axis(pygame.CONTROLLER_AXIS_RIGHTX)*0.05
+                act[3] += pygame.joystick.Joystick(0).get_axis(pygame.CONTROLLER_AXIS_RIGHTY)*0.05
+                if pygame.joystick.Joystick(0).get_button(pygame.CONTROLLER_BUTTON_X):
+                    act[4] += 0.05
+                if pygame.joystick.Joystick(0).get_button(pygame.CONTROLLER_BUTTON_Y):
+                    act[4] -= 0.05
                 act[5] = math.atan2(act[1], act[0])
+                if pygame.joystick.Joystick(0).get_button(pygame.CONTROLLER_BUTTON_A):
+                    act[6] += 0.05
+                if pygame.joystick.Joystick(0).get_button(pygame.CONTROLLER_BUTTON_B):
+                    act[6] -= 0.05
+                act = np.clip(act, self.action_space.low, self.action_space.high)
             return act
         return TeleopAgent(act)
